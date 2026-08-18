@@ -71,6 +71,8 @@ function install_java {
 }
 
 function install_paper {
+    # Ensure the correct Java version is installed for this MC release
+    auto_java_for_mc "$paper"
     printout info "Downloading Paper Server..."
     if [ -n "$MCJARS_API_KEY" ]; then
         jar_url=$(curl --silent --fail --request GET --header "Authorization: $MCJARS_API_KEY" --url "https://versions.mcjars.app/api/v2/builds/PAPER/$paper" | jq -r '.builds[0].jarUrl')
@@ -98,6 +100,8 @@ function install_paper {
 }
 
 function install_pufferfish {
+    # Ensure the correct Java version is installed for this MC release
+    auto_java_for_mc "$pufferfish"
     printout info "Downloading Pufferfish Server..."
     if [ -n "$MCJARS_API_KEY" ]; then
         jar_url=$(curl --silent --fail --request GET --header "Authorization: $MCJARS_API_KEY" --url "https://versions.mcjars.app/api/v2/builds/PUFFERFISH/$pufferfish" | jq -r '.builds[0].jarUrl')
@@ -125,6 +129,8 @@ function install_pufferfish {
 }
 
 function install_purpur {
+    # Ensure the correct Java version is installed for this MC release
+    auto_java_for_mc "$purpur"
     printout info "Downloading Purpur Server..."
     if [ -n "$MCJARS_API_KEY" ]; then
         jar_url=$(curl --silent --fail --request GET --header "Authorization: $MCJARS_API_KEY" --url "https://versions.mcjars.app/api/v2/builds/PURPUR/$purpur" | jq -r '.builds[0].jarUrl')
@@ -152,6 +158,8 @@ function install_purpur {
 }
 
 function install_vanilla {
+    # Ensure the correct Java version is installed for this MC release
+    auto_java_for_mc "$vanilla"
     printout info "Downloading Vanilla Server..."
     if [ -n "$MCJARS_API_KEY" ]; then
         jar_url=$(curl --silent --fail --request GET --header "Authorization: $MCJARS_API_KEY" --url "https://versions.mcjars.app/api/v2/builds/VANILLA/$vanilla" | jq -r '.builds[0].jarUrl')
