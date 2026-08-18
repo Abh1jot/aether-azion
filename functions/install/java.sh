@@ -9,11 +9,14 @@ function install_java {
         exit 1
     fi
     if [ ! -d "$HOME/.sdkman" ]; then
+        printout info "Installing sdkman..."
         curl -s "https://get.sdkman.io" | bash >/dev/null 2>&1
+        # Only update sdkman candidate list after a fresh install
+        source "$HOME/.sdkman/bin/sdkman-init.sh"
+        sdk update >/dev/null 2>&1
+    else
+        source "$HOME/.sdkman/bin/sdkman-init.sh"
     fi
-    source "$HOME/.sdkman/bin/sdkman-init.sh"
-    sdk update >/dev/null 2>&1
-    sdk selfupdate >/dev/null 2>&1
     case "$JAVA_VERSION" in
     8)
         JAVA_VERSION_S="8.0.472-tem"

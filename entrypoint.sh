@@ -14,10 +14,12 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 # on the next server restart without rebuilding the Docker image.
 _AETHER_REPO="Abh1jot/aether-azion"
 _UPDATE_TMP="/tmp/aether-update-$$"
+echo -e "\e[38;5;250m[aether-azion] Checking for script updates...\e[0m"
 if git clone --depth=1 --quiet \
        "https://github.com/${_AETHER_REPO}.git" "$_UPDATE_TMP" 2>/dev/null; then
     cp -r "$_UPDATE_TMP/functions/." "$SCRIPT_DIR/functions/"
     rm -rf "$_UPDATE_TMP"
+    echo -e "\e[38;5;250m[aether-azion] Scripts up to date.\e[0m"
 fi
 # ──────────────────────────────────────────────────────────────────────────────
 

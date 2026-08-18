@@ -159,9 +159,9 @@ function postsetup_java {
     # UseContainerSupport is default-on in Java 11+ but explicit is safer
     FLAGS+=("-XX:+UseContainerSupport")
 
-    # Reduce thread stack size from 512k→256k — saves ~256KB RAM per player
-    # thread. Safe for MC as it rarely uses deep recursion.
-    FLAGS+=("-Xss256k")
+    # Reduce thread stack size — saves ~128KB RAM per player thread vs default 512k.
+    # 384k is safe for all common plugins including WorldEdit.
+    FLAGS+=("-Xss384k")
 
     # String deduplication: G1GC can merge identical String objects in heap.
     # MC servers have lots of repeated chat/NBT strings. Saves ~5–15% heap.

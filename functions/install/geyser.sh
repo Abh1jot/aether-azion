@@ -152,12 +152,16 @@ function install_geyser {
     fi
 
     source "$HOME/.sdkman/bin/sdkman-init.sh" 2>/dev/null || true
+    # Ensure the correct Java binary is in PATH before starting
+    if [ -n "$JAVA_HOME" ] && [ -f "$JAVA_HOME/bin/java" ]; then
+        export PATH="$JAVA_HOME/bin:$PATH"
+    fi
 
     # Start Java server in background, redirect its output to a log
     local bg_log="$HOME/system/geyser-keygen.log"
     mkdir -p "$HOME/system"
     java -Dterminal.jline=false -Dterminal.ansi=true \
-        -Xms128M -Xmx512M \
+        -Xms128M -Xmx384M \
         -jar server.jar nogui > "$bg_log" 2>&1 &
     local BG_PID=$!
 
@@ -264,37 +268,33 @@ function _write_geyser_config {
 bedrock:
   # Bind to all interfaces (required for Pterodactyl containers)
   address: 0.0.0.0
-  # UDP port Bedrock clients will connect to.
-  # On Pterodactyl with a single allocation, UDP and TCP share the same port
-  # number but are completely separate protocols — this is safe and correct.
+  # UDP port Bedrock clients connect to.
+  # On Pterodactyl single-port, UDP and TCP share the same number — totally safe.
   port: ${SERVER_PORT}
-  # Do NOT enable clone-remote-port when setting the port explicitly above
   clone-remote-port: false
   motd1: "GeyserMC"
   motd2: "Powered by aether-azion"
-  # Display name shown in the Bedrock server list
   server-name: "Geyser"
   compression-level: 6
   enable-proxy-protocol: false
 
 java:
-  # The Java server Geyser bridges to (loopback — same container)
+  # Loopback — Geyser and the Java server are in the same container
   address: 127.0.0.1
   port: ${SERVER_PORT}
 
-# floodgate: allows Bedrock players to join without a Java account
+# floodgate: Bedrock players can join without a Java account
 auth-type: floodgate
 
-# Recommended for shared / free-tier hosting
+# Performance tweaks for free-tier / shared nodes
 cache-images: 0
 allow-third-party-capes: true
 allow-third-party-ears: false
 show-cooldown: title
 show-credits: true
 emote-offhand-workaround: "no-emotes"
-
-# Forward player IPs correctly inside the container
-use-adapters: true
+# Extra time for slower connections on free-tier nodes (ms)
+pending-authentication-timeout: 120
 
 metrics:
   enabled: false
