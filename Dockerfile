@@ -31,8 +31,10 @@ RUN apt-get update -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# Step 2: Create the container user and mark entrypoint executable
-RUN adduser --disabled-password --home /home/container container \
+# Step 2: Create the container user and mark entrypoint executable.
+# useradd is part of the base 'passwd' package (always present).
+# adduser is a separate package not included in ubuntu:noble minimal image.
+RUN useradd --create-home --home-dir /home/container --shell /bin/bash container \
  && chmod +x /entrypoint.sh
 
 # Pterodactyl requires a non-root user
