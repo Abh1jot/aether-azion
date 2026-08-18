@@ -87,6 +87,12 @@ function install_paper {
     create_config "mc_java_paper"
     port_assign
     printout info "Server jar downloaded successfully (Size: $jar_size)"
+    # ── Geyser support ──────────────────────────────────────────────────────
+    ask_geyser "$paper"
+    if [[ "$GEYSER_ENABLED" == "1" ]]; then
+        install_geyser
+    fi
+    # ────────────────────────────────────────────────────────────────────────
     launchJavaServer
     exit
 }
@@ -108,6 +114,12 @@ function install_pufferfish {
     create_config "mc_java_pufferfish"
     port_assign
     printout info "Server jar downloaded successfully (Size: $jar_size)"
+    # ── Geyser support ──────────────────────────────────────────────────────
+    ask_geyser "$pufferfish"
+    if [[ "$GEYSER_ENABLED" == "1" ]]; then
+        install_geyser
+    fi
+    # ────────────────────────────────────────────────────────────────────────
     launchJavaServer
     exit
 }
@@ -129,6 +141,12 @@ function install_purpur {
     create_config "mc_java_purpur"
     port_assign
     printout info "Server jar downloaded successfully (Size: $jar_size)"
+    # ── Geyser support ──────────────────────────────────────────────────────
+    ask_geyser "$purpur"
+    if [[ "$GEYSER_ENABLED" == "1" ]]; then
+        install_geyser
+    fi
+    # ────────────────────────────────────────────────────────────────────────
     launchJavaServer
     exit
 }
@@ -150,6 +168,14 @@ function install_vanilla {
     create_config "mc_java_vanilla"
     port_assign
     printout info "Server jar downloaded successfully (Size: $jar_size)"
+    # ── Geyser support ──────────────────────────────────────────────────────
+    # Vanilla does not use the plugins/ folder natively, but Geyser-Spigot
+    # can still work if the user knows what they are doing. We still ask.
+    ask_geyser "$vanilla"
+    if [[ "$GEYSER_ENABLED" == "1" ]]; then
+        install_geyser
+    fi
+    # ────────────────────────────────────────────────────────────────────────
     launchVanillaServer
     exit
 }

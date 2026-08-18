@@ -99,6 +99,8 @@ function check_existing_install {
 
         clear
         display
+        # Sync Geyser keys in case Geyser is already installed
+        geyser_sync_keys
         if [ "$_detected_type" = "mc_java_vanilla" ]; then
             launchVanillaServer
         else

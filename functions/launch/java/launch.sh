@@ -5,6 +5,8 @@ function launchJavaServer {
     install_java
     postsetup_java
     optimize_server
+    # Sync Floodgate key.pem → Geyser on every boot (safe no-op if not installed)
+    geyser_sync_keys
     if [[ -n "$HOSTING_NAME" && -n "$DISCORD_LINK" && "$ENABLE_FORCED_MOTD" == "1" ]]; then
         forced_motd
     fi
@@ -21,6 +23,8 @@ function launchVanillaServer {
     printout info "Checking if Java is up to date..."
     install_java
     postsetup_java
+    # Sync Floodgate key.pem → Geyser on every boot (safe no-op if not installed)
+    geyser_sync_keys
     if [[ -n "$HOSTING_NAME" && -n "$DISCORD_LINK" && "$ENABLE_FORCED_MOTD" == "1" ]]; then
         forced_motd
     fi
