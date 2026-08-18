@@ -33,9 +33,10 @@ RUN apt-get update -y \
 
 # Step 2: Create the container user and mark entrypoint executable.
 # useradd is part of the base 'passwd' package (always present).
-# adduser is a separate package not included in ubuntu:noble minimal image.
+# chown /functions so the container user can write to it — this is
+# required for the GitHub self-update (cp -r) to succeed on every boot.
 RUN useradd --create-home --home-dir /home/container --shell /bin/bash container \
- && chmod +x /entrypoint.sh
+ && chown -R container:container /functions /entrypoint.sh
 
 # Pterodactyl requires a non-root user
 USER container

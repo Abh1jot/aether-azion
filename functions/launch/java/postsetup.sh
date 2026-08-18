@@ -80,12 +80,29 @@ function postsetup_java {
     if [ -n "$SERVER_ICON_URL" ]; then
         printout info "🖼  Applying admin server icon..."
         if curl -sS -L --max-time 15 -o server-icon.png "$SERVER_ICON_URL" 2>/dev/null; then
+            # Verify it's a valid PNG (magic bytes: 89 50 4E 47)
             local _magic; _magic=$(od -A n -N 4 -t x1 server-icon.png 2>/dev/null | tr -d ' \n')
-            [ "$_magic" = "89504e47" ] \
-                && printout success "Server icon applied" \
-                || { printout warn "SERVER_ICON_URL is not a valid PNG — skipped"; rm -f server-icon.png; }
+            if [ "$_magic" != "89504e47" ]; then
+                printout warn "SERVER_ICON_URL is not a valid PNG — skipped"
+                rm -f server-icon.png
+            else
+                # Read actual PNG dimensions from IHDR chunk (bytes 16-19 = width, 20-23 = height)
+                local _w_hex _h_hex _iw _ih
+                _w_hex=$(od -A n -N 4 -j 16 -t x1 server-icon.png 2>/dev/null | tr -d ' \n')
+                _h_hex=$(od -A n -N 4 -j 20 -t x1 server-icon.png 2>/dev/null | tr -d ' \n')
+                _iw=$(( 16#${_w_hex:-0} ))
+                _ih=$(( 16#${_h_hex:-0} ))
+                if [ "$_iw" -eq 64 ] && [ "$_ih" -eq 64 ]; then
+                    printout success "Server icon applied (64x64)"
+                else
+                    printout warn "Server icon is ${_iw}x${_ih}px — Minecraft requires EXACTLY 64x64 pixels."
+                    printout warn "Resize free at: https://www.picresize.com"
+                    printout warn "  → Upload image → Exact Size → 64 x 64 → Export as PNG → re-host → update SERVER_ICON_URL"
+                    rm -f server-icon.png
+                fi
+            fi
         else
-            printout warn "Failed to download server icon"
+            printout warn "Failed to download server icon — check SERVER_ICON_URL is publicly accessible"
         fi
     fi
 

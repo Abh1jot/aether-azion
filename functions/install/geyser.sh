@@ -203,16 +203,19 @@ function _write_geyser_config {
     local config_path="$1"
     cat > "$config_path" << GEYSER_EOF
 # Geyser-Spigot configuration — pre-configured by aether-azion
-# Full reference: https://wiki.geysermc.org/geyser/understanding-the-config/
+# Reference: https://wiki.geysermc.org/geyser/understanding-the-config/
+#
+# Minimal config — Geyser uses safe defaults for anything not listed here.
+# DO NOT set uuid: under metrics — Geyser auto-generates it on first start.
 
 bedrock:
   address: 0.0.0.0
-  # UDP port — same number as your Java port but a different protocol. Safe.
+  # Same port number as Java, different protocol (UDP). Safe on Pterodactyl.
   port: ${SERVER_PORT}
   clone-remote-port: false
-  motd1: "GeyserMC"
-  motd2: "Powered by aether-azion"
-  server-name: "Geyser"
+  motd1: "Powered by aether-azion"
+  motd2: "Java + Bedrock"
+  server-name: "GeyserMC"
   compression-level: 6
   enable-proxy-protocol: false
 
@@ -224,18 +227,11 @@ java:
 # Bedrock players join without a Java account via Floodgate
 auth-type: floodgate
 
-# Tweaks for free-tier / shared hosting
-cache-images: 0
-allow-third-party-capes: true
-allow-third-party-ears: false
-show-cooldown: title
-show-credits: true
-emote-offhand-workaround: "no-emotes"
 # Extra auth timeout for slower free-tier connections (ms)
 pending-authentication-timeout: 120
 
+# Disable telemetry
 metrics:
   enabled: false
-  uuid: default
 GEYSER_EOF
 }
