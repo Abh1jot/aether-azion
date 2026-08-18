@@ -1,30 +1,28 @@
 FROM ubuntu:24.04
 
-# Set environment variables for user and home directory
 ENV USER=container
 ENV HOME=/home/container
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Set the working directory
 WORKDIR /home/container
 
-# Copy scripts to container
 COPY ./entrypoint.sh /entrypoint.sh
 COPY ./functions /functions
 COPY ./files /files
 
-# Install all required packages in a single layer to keep image size minimal.
-# - tini:        proper init process — forwards SIGTERM/SIGINT to the MC server
+# Install dependencies in a single layer.
+# tini is installed directly from GitHub releases (not apt) because the Ubuntu
+# 24.04 Docker image does not enable the 'universe' repo by default, which
+# causes exit code 127 (command not found) during apt-get install tini.
 # - curl/wget:   downloads (sdkman, server jars, MCJars API)
-# - unzip:       read JAR manifests for existing-install detection
-# - jq:          JSON parsing for MCJars API responses
-# - util-linux:  lscpu (used by display.sh for hardware info)
-# - procps:      free (RAM display)
-# - git:         optional, for mod/plugin tooling
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends \
-        tini \
+# - unzip:       JAR manifest reads for existing-install detection
+# - jq:          JSON parsing for MCJars API
+# - git:         self-update pull from GitHub on every boot
+# - util-linux:  lscpu for hardware info in display.sh
+# - procps:      free command for RAM display
+# - od:          PNG magic-byte check for server icon validation
+RUN apt-get update -y \
+ && apt-get install -y --no-install-recommends \
         curl \
         wget \
         zip \
@@ -35,15 +33,19 @@ RUN apt-get update -y && \
         util-linux \
         procps \
         ca-certificates \
-        tzdata && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    adduser --disabled-password --home /home/container container && \
-    chmod +x /entrypoint.sh
+        tzdata \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* \
+ && curl -fsSL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$(dpkg --print-architecture) \
+        -o /usr/local/bin/tini \
+ && chmod +x /usr/local/bin/tini \
+ && adduser --disabled-password --home /home/container container \
+ && chmod +x /entrypoint.sh
 
-# Switch to non-root user
+# Switch to non-root user (required by Pterodactyl)
 USER container
 
-# Use tini as PID 1 so SIGTERM is properly forwarded to the Java process
-ENTRYPOINT ["/usr/bin/tini", "--"]
+# tini as PID 1: forwards SIGTERM to the Java process so the MC server
+# shuts down cleanly when Pterodactyl stops the container.
+ENTRYPOINT ["/usr/local/bin/tini", "--"]
 CMD ["/bin/bash", "/entrypoint.sh"]
