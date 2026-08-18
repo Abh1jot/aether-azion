@@ -2,12 +2,24 @@
 # aether-azion (fork of lonersoft/aether)
 # Optimised for Minecraft free hosting on Azion Cloud
 # Licensed under the MIT License
-# Original: https://github.com/lonersoft/aether
+# Repo: https://github.com/Abh1jot/aether-azion
 
 ARCH=$([[ "$(uname -m)" == "x86_64" ]] && printf "amd64" || printf "arm64")
 
-# Get script directory
+# Get script directory — /functions lives here (baked into Docker image)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# ── Self-update: pull latest scripts from GitHub on every boot ─────────────
+# This means any push to https://github.com/Abh1jot/aether-azion takes effect
+# on the next server restart without rebuilding the Docker image.
+_AETHER_REPO="Abh1jot/aether-azion"
+_UPDATE_TMP="/tmp/aether-update-$$"
+if git clone --depth=1 --quiet \
+       "https://github.com/${_AETHER_REPO}.git" "$_UPDATE_TMP" 2>/dev/null; then
+    cp -r "$_UPDATE_TMP/functions/." "$SCRIPT_DIR/functions/"
+    rm -rf "$_UPDATE_TMP"
+fi
+# ──────────────────────────────────────────────────────────────────────────────
 
 # Source all functions (sorted for deterministic load order)
 for file in $(find "$SCRIPT_DIR/functions" -name "*.sh" -type f | sort); do

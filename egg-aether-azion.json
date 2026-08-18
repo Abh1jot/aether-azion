@@ -10,7 +10,7 @@
     "description": "\ud83e\udd5a aether-azion \u2014 free Minecraft hosting fork optimised for Azion Cloud. Auto-detects existing Paper/Vanilla installations.",
     "features": null,
     "docker_images": {
-        "aether-azion Latest": "ghcr.io\/lonersoft\/aether:main"
+        "aether-azion Latest": "ghcr.io\/Abh1jot\/aether-azion:main"
     },
     "file_denylist": [],
     "startup": ".\/entrypoint.sh",
@@ -40,12 +40,12 @@
         },
         {
             "name": "Additional Flags",
-            "description": "This allows you to use additional flags such as Aikar's Flags, Velocity Flags, or none at all. Aikar's Flags are recommended for Bukkit-based servers (for example, Paper, Purpur...)",
+            "description": "JVM flag preset. Aikar's Flags = best for Paper/Purpur. Velocity Flags = best for proxies. ZGC (Java 21+) = ultra-low GC pauses for large RAM or tick-sensitive servers.",
             "env_variable": "ADDITIONAL_FLAGS",
             "default_value": "Aikar's Flags",
             "user_viewable": true,
             "user_editable": true,
-            "rules": "required|string|in:None,Aikar's Flags,Velocity Flags",
+            "rules": "required|string|in:None,Aikar's Flags,Velocity Flags,ZGC (Java 21+)",
             "field_type": "text"
         },
         {
@@ -146,6 +146,46 @@
             "user_viewable": false,
             "user_editable": false,
             "rules": "nullable|string|size:64",
+            "field_type": "text"
+        },
+        {
+            "name": "Forced MOTD Line 1 (ADMIN ONLY)",
+            "description": "First line of the server MOTD shown in the Minecraft server list. Overrides any user changes on every restart. Supports §-color codes (e.g. §6§lMy Server). Leave empty to let users set their own MOTD.",
+            "env_variable": "FORCED_MOTD_LINE1",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "nullable|string|max:59",
+            "field_type": "text"
+        },
+        {
+            "name": "Forced MOTD Line 2 (ADMIN ONLY)",
+            "description": "Second line of the server MOTD. Only used if Forced MOTD Line 1 is also set.",
+            "env_variable": "FORCED_MOTD_LINE2",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "nullable|string|max:59",
+            "field_type": "text"
+        },
+        {
+            "name": "Server Icon URL (ADMIN ONLY)",
+            "description": "URL to a 64x64 PNG image used as the server icon in the Minecraft server list. Downloaded and applied on every restart — users cannot permanently change it. Host on Imgur, GitHub raw, or any public CDN.",
+            "env_variable": "SERVER_ICON_URL",
+            "default_value": "",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "nullable|string",
+            "field_type": "text"
+        },
+        {
+            "name": "Max CPU Cores (ADMIN ONLY)",
+            "description": "Limit how many CPU cores the JVM can use (-XX:ActiveProcessorCount). Prevents Java from monopolising all vCPUs on shared Azion nodes. Set to 0 to let the JVM auto-detect (default).",
+            "env_variable": "MAX_CPU_CORES",
+            "default_value": "0",
+            "user_viewable": false,
+            "user_editable": false,
+            "rules": "required|integer|min:0|max:32",
             "field_type": "text"
         }
     ]
