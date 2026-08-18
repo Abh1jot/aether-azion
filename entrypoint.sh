@@ -1,15 +1,15 @@
 #!/bin/bash
-# aether v1
-# A multiegg for hosting companies to host Minecraft servers. it's also not shit so you should use it
+# aether-azion (fork of lonersoft/aether)
+# Optimised for Minecraft free hosting on Azion Cloud
 # Licensed under the MIT License
-# Forked from Primectyl by divyamboii, licensed under the MIT License
+# Original: https://github.com/lonersoft/aether
 
 ARCH=$([[ "$(uname -m)" == "x86_64" ]] && printf "amd64" || printf "arm64")
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Source all functions
+# Source all functions (sorted for deterministic load order)
 for file in $(find "$SCRIPT_DIR/functions" -name "*.sh" -type f | sort); do
     source "$file"
 done
@@ -18,7 +18,14 @@ done
 #          Main Script             #
 ####################################
 function main {
+    # ── NEW: detect pre-existing Paper/Vanilla/Bedrock/proxy installs ──
+    # This runs BEFORE check_config so migrated servers boot straight away.
+    check_existing_install
+
+    # Normal config-based routing (server already ran aether before)
     check_config
+
+    # First-time setup wizard
     while true; do
         clear
         display

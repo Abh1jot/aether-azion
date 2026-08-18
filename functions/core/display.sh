@@ -8,12 +8,14 @@ function display {
     echo -e "\e[38;2;195;144;230m  Location: \e[38;5;250m$P_SERVER_LOCATION\e[0m"
     echo -e "\e[38;2;195;144;230m  Server Port: \e[38;5;250m$SERVER_PORT\e[0m"
     echo -e "\e[1;36m \e[0m"
-    echo -e "\e[1;36m \e[0m"
-    if [ "$HOSTING_NAME" == "OrynCloud" ]; then
-        toilet -f "smblock" "OrynCloud" -w 200 | sed "s/^/\x1b[38;5;93m/" | sed "s/$/\x1b[0m/"
-    else
-        toilet -f "smblock" --filter gay "$HOSTING_NAME" -w 200
-    fi
+
+    # Pure-bash coloured banner (no toilet dependency)
+    local name="${HOSTING_NAME:-aether-azion}"
+    echo -e "\e[38;5;93m╔══════════════════════════════════════════╗\e[0m"
+    echo -e "\e[38;5;93m║  \e[1;97m★  ${name}  ★\e[0m\e[38;5;93m\e[0m"
+    echo -e "\e[38;5;93m║  \e[38;5;250mFree Minecraft Hosting on Azion Cloud\e[0m\e[38;5;93m\e[0m"
+    echo -e "\e[38;5;93m╚══════════════════════════════════════════╝\e[0m"
+
     echo -e "\e[1;36m \e[0m"
     printout info "wanna suggest a new server software? create an issue here:"
     printout info "https://link.loners.software/aether/software"
@@ -28,3 +30,4 @@ function display {
         echo -e "\e[1;36m \e[0m"
     fi
 }
+

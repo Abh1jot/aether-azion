@@ -117,7 +117,7 @@ function postsetup_java {
 		if [[ "$JAVA_VERSION" -ge 16 ]] && [[ "$JAVA_VERSION" -le 21 ]]; then
 			FLAGS+=("--add-modules=jdk.incubator.vector")
 		else
-			printout warning "SIMD Operations are only available for Java 16 - 21, skipping..."
+			printout warn "SIMD Operations are only available for Java 16 - 21, skipping..."
 		fi
 	fi
 
@@ -127,5 +127,12 @@ function postsetup_java {
 		FLAGS+=("-XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1HeapRegionSize=4M -XX:MaxInlineLevel=15")
 	fi
 
+    # On Azion free-tier nodes memory is shared; keep Xms low so the OS
+    # has headroom during cold-start. Xmx is still derived from MAXIMUM_RAM.
     SERVER_MEMORY_REAL=$(($SERVER_MEMORY*$MAXIMUM_RAM/100))
+    # Enforce a minimum of 256 MB to avoid OutOfMemoryErrors on tiny plans
+    if [ "$SERVER_MEMORY_REAL" -lt 256 ]; then
+        SERVER_MEMORY_REAL=256
+        printout warn "Calculated max memory is below 256 MB — clamped to 256 MB. Consider upgrading your plan."
+    fi
 }

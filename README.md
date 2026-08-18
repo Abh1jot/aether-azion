@@ -1,76 +1,87 @@
-> [!WARNING]
-> aether is going through a pretty good rewrite of almost everything, this also includes the admin only variables to be replaced by a file hosted on your servers as the variables instead. thanks for using aether <3
-> 
-> ps. the rewrite is happening on a private repo, so you won't have access to it
+> [!NOTE]
+> This is a fork of [lonersoft/aether](https://github.com/lonersoft/aether), optimised for **free Minecraft hosting on Azion Cloud**.
 
-# 🥚 aether [![wakatime](https://wakatime.com/badge/github/lonersoft/aether.svg)](https://wakatime.com/badge/github/lonersoft/aether) [![Create and publish the egg on ghcr.io](https://github.com/lonersoft/aether/actions/workflows/docker-publish.yml/badge.svg?branch=main)](https://github.com/lonersoft/aether/actions/workflows/docker-publish.yml)
+# 🥚 aether-azion
 
-A simple multiegg that's highly configurable (in my opinion), ~~that's paid~~ all for free and open source!
+A Pterodactyl multi-egg for free Minecraft hosting, built on top of [aether](https://github.com/lonersoft/aether) with targeted improvements for Azion Cloud free-tier nodes.
 
-aether is a multiegg designed to simply server management for hosting providers. Currently, it only supports Minecraft, but more may come soon.
+---
 
-## 🧩 Features
-there's not alot of impressive features, but some of them might be useful such as:
-* built-in rules: when enabled, the first boot of a server will show them rules to comply with a confirmation
-* set MCJars API Key: track some stats like the total requests, and even block some server software from there!
-* forced MOTD: put your hosting name on their server's MOTD! this does not block plugins that interact with the MOTD such as [`➚ MiniMOTD`](https://modrinth.com/plugin/minimotd) or [`➚ AdvancedServerList`](https://modrinth.com/plugin/advancedserverlist)
-* custom logo: need the banner to be purple? or something else to match your branding? [`➚ head here to get a free custom banner!`](#%EF%B8%8F-hostings-that-use-aether) your hosting will also be on the list
+## ✨ What's different from upstream
 
-any ideas you may wanna see? [`➚ create an issue!`](https://github.com/lonersoft/aether/issues/new)
+| Area | Upstream aether | aether-azion (this fork) |
+|---|---|---|
+| **Existing-install detection** | ❌ none — server wiped on egg change | ✅ Auto-detects Paper / Vanilla / Bedrock / proxy; boots straight in |
+| **Docker base** | `ubuntu:latest` (floating) | `ubuntu:24.04` (pinned LTS) |
+| **Init process** | plain bash | `tini` — proper SIGTERM → Java process forwarding |
+| **toilet dependency** | required | removed — pure-bash banner |
+| **Default MAXIMUM_RAM** | 90 % | 80 % (Azion nodes have shared OS overhead) |
+| **Default Java** | 25 | 21 (Paper requires 21 minimum) |
+| **Default flags** | None | Aikar's Flags (best for Paper on low RAM) |
+| **Memory floor** | none | 256 MB minimum enforced |
+| **`warning` log level** | broken (typo) | fixed → `warn` |
 
-## 💖 Donate
-aether is free and open-source software. To host this egg, a lot of resources and money (and most importantly, time!) is used to run the servers. To keep our motivation going and keep everything up and running, we rely heavily on [`➚ donations`](https://hcb.hackclub.com/lonersoft/donations). We're also nonprofit and transparent with our finances! 
+---
 
-[➚ **Donate to our nonprofit organization**](https://hcb.hackclub.com/donations/start/lonersoft) or [`➚ view our open finances`](https://hcb.hackclub.com/lonersoft).
+## 🔍 Existing Installation Detection (key feature)
+
+If a server was originally created with the **stock Pterodactyl Paper egg** and the egg is later switched to aether-azion, the first boot will:
+
+1. Scan for `server.jar`, `plugins/`, `server.properties`, `bedrock_server`, proxy configs
+2. Read the JAR's MANIFEST.MF to identify the software (Paper, Purpur, Pufferfish, Spigot, Vanilla…)
+3. Automatically write `system/multiegg.yml` with the correct type
+4. Fix `server-ip` and `server-port` to match Pterodactyl's allocation
+5. Boot the server **without touching any world data, plugins, or configs**
+
+> [!IMPORTANT]
+> Your worlds and plugins are **never deleted or modified**. Only `server-ip` and `server-port` in `server.properties` are updated.
+
+---
+
+## 🧩 Inherited Features (from upstream aether)
+
+- **Multi-software menu** — Java (Vanilla, Paper, Purpur, Pufferfish), Bedrock, Proxies (BungeeCord, Velocity, Waterfall)
+- **Automatic updating** — via MCJars API hash comparison
+- **Built-in rules** — first-boot ToS acceptance screen
+- **Forced MOTD** — admin-configurable MOTD branding
+- **Server optimization** — optional Hibernate plugin injection
+- **MCJars API Key** — for tracking and software blocking
+
+---
 
 ## ➕ Installation
-1. get the egg [`➚ here`](https://github.com/lonersoft/aether/releases/latest) and download the json file
-2. navigate to yourpanelurl.com/admin/nests and create a new nest (optional)
-3. upload the json file to your newly created nest, or use a existing nest
-4. check the startup tab! there might be features you may want enabled, such as the forced MOTD
-4. ???
-5. profit
 
-## 🖥️ Hostings that use aether
+1. Download `egg-aether-azion.json` from this repo
+2. In Pterodactyl → Admin → Nests → Import Egg
+3. When creating a new server, select **aether-azion** as the egg
 
-| Hostings                                     | About                                                                                                                                        | Custom banner? | Notes    |
-|---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|-----|---------------------|
-| [**OrynCloud**](https://www.oryncloud.com/) | Host your perfect game server with lightning-fast speeds, 99.9% uptime, and DDoS protection. The premier choice for serious gamers in India. | ✅ | Used in free hosting
+### Migrating an existing Paper server
 
-want your hosting listed here and/or have a custom banner? [📧 email me!](mailto:lumi@votion.dev) it's free!
+1. **Do NOT reinstall** the server
+2. Switch the egg to aether-azion in the Admin panel
+3. Restart — the egg will auto-detect your existing Paper install and boot normally
 
-## 👥 Contributors
-wanna contribute? thanks! to start contributing, you have to [`➚ fork this repo`](https://github.com/lonersoft/aether/fork) and then [`➚ open a PR`](https://github.com/lonersoft/aether/compare).
+---
 
-<a href="https://github.com/lonersoft/aether/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=lonersoft/aether" />
-</a>
+## ⚙️ Egg Variables
 
-## 🌟 Stargazers
-<a href="https://github.com/lonersoft/aether/stargazers/">
-  <picture>
-    <source media="(prefers-color-scheme: light)" srcset="http://reporoster.com/stars/lonersoft/aether">
-    <img alt="stargazer-widget" src="http://reporoster.com/stars/dark/lonersoft/aether">
-  </picture>
-</a>
+| Variable | Default | Description |
+|---|---|---|
+| `JAVA_VERSION` | `21` | Java version (8/11/17/21/23/24/25) |
+| `ADDITIONAL_FLAGS` | `Aikar's Flags` | JVM flag preset |
+| `AUTOMATIC_UPDATING` | `0` | Auto-update server jar on boot |
+| `MAXIMUM_RAM` | `80` | % of `SERVER_MEMORY` to give to Java |
+| `SIMD_OPERATIONS` | `0` | Enable `jdk.incubator.vector` (Java 16–21) |
+| `HOSTING_NAME` | `aether-azion` | *(Admin)* Your hosting brand name |
+| `DISCORD_LINK` | *(empty)* | *(Admin)* discord.gg invite code |
+| `EMAIL` | *(empty)* | *(Admin)* Support email |
+| `ENABLE_FORCED_MOTD` | `0` | *(Admin)* Force branding MOTD |
+| `OPTIMIZE_SERVER` | `0` | *(Admin)* Install Hibernate plugin |
+| `ENABLE_RULES` | `0` | *(Admin)* Show rules on first boot |
+| `MCJARS_API_KEY` | *(empty)* | *(Admin)* MCJars API key |
 
-## ⚒️ Roadmap
-right now, this is what i'm planning to do:
+---
 
-- [ ] 💾 decrease docker image size (current is ~250mb)
-- [ ] 🤖 maybe setup bot languages? might take a lot of space tho
-- [x] ❓ organize the functions of the egg, current egg is kinda hard to understand in my opinion
-- [ ] ⌨️ don't make the startup tab filled with admin-only variables, perhaps with a .json file that people can host themselves?
-- [ ] 🔒 lock server softwares that hostings may not need
-- [ ] ➕ enable ability to change rules
+## 📜 License
 
-## 💖 Credits
-this project wouldn't have been possible without theses projects:\
-Primectyl (closed src): provided some bases of how software install works, basically what inspired me to make my own multiegg\
-[`➚ Pterodactyl`](https://pterodactyl.io/): the game panel everyone loves! it is a free, open-source game server management panel built with PHP, React, and Go.\
-[`➚ MCJars`](https://mcjars.app): the place where we get the server.jar's, i love the service\
-[`➚ MC JAR FILES`](https://mcjarfiles.com/): the place where we get the bedrock vanilla dedicated servers, god i love this service 💖\
-and some that i forgot! my bad :(
-
-## 📄 Licensing
-aether is licensed under the [`➚ MIT license`](https://github.com/lonersoft/aether/blob/main/LICENSE)
+MIT — same as upstream [lonersoft/aether](https://github.com/lonersoft/aether)
