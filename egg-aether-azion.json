@@ -10,7 +10,7 @@
     "description": "\ud83e\udd5a aether-azion \u2014 free Minecraft hosting fork optimised for Azion Cloud. Auto-detects existing Paper/Vanilla installations.",
     "features": null,
     "docker_images": {
-        "aether-azion Latest": "ghcr.io\/Abh1jot\/aether-azion:main"
+        "aether-azion Latest": "ghcr.io\/abh1jot\/aether-azion:main"
     },
     "file_denylist": [],
     "startup": ".\/entrypoint.sh",
